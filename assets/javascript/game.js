@@ -4,7 +4,7 @@ $(document).ready(function() {
 
 	// global variables declared here:
 	// set of words used in the game
-	var wordSet = ["forrest", "leaving", "bramble", "dogwood", "hickory", "redwood", "sequoia", "palmyra", "almonds", "barking"];
+	var wordSet = ["nesting", "leaving", "bramble", "dogwood", "hickory", "redwood", "sequoia", "palmyra", "almonds", "barking"];
 	
 	// array to capture words alrady used
 	var wordsUsed = ["placeholder"];
@@ -68,8 +68,8 @@ $(document).ready(function() {
 	window.addEventListener('keyup', function (entry) {
 		//when user hits "enter", change the text on the screen to the difficulty instructions
 		if (entry.keyCode === 13 && loop1 < 1) {
-			$("#text1").html("First, let's decide just how hard we want to make this.  Choose the number of wrong guesses you are allowed per round of the game.<br>NOTE: 15 guesses is really easy, 5 would be really hard.");
-			$("#text2").html(">PRESS 'ENTER' KEY TO CONTINUE<");
+			$("#text1").html("First, let's decide just how hard we want to make this.  Choose the number of wrong guesses you are allowed per round of the game.<br>NOTE: 15 guesses is really easy, 5 would be really hard. Remember, my neck is on the line here.");
+			$("#text2").html(">PRESS 'ENTER' KEY TO CHOOSE<");
 			loop1++;
 			console.log("loop1: " + loop1);
 		}
@@ -78,19 +78,20 @@ $(document).ready(function() {
 		else if (entry.keyCode === 13 && loop1 < 2) {
 			setDifficulty();
 			console.log("guesses (loop): " + guesses);
-			$("#text1").html("OK, here we go.  Press a key to choose a letter until you have found all of the hidden letters or you have run out of guesses.  <br>HINT: I think the words have something to do with trees, but I can't figure out why.");
+			$("#text1").html("OK, here we go.  Please be good!  Press a key to choose a letter until you have found all of the hidden letters or you have run out of guesses.  <br>HINT: I think the words have something to do with trees, but I can't figure out why.");
 			$("#text2").html(">PRESS A LETTER KEY<");
 			loop1++;
 			console.log("loop1: " + loop1);
 			$("#remaining").html("REMAINING WRONG GUESSES ALLOWED: " + guesses);
 			//play funky game track
-			audio = new Audio("assets/sounds/Funkorama.mp3");
-			audio.play();
+			audio1 = new Audio("assets/sounds/Funkorama.mp3");
+			audio1.play();
+			changeImage(guesses);
 		}
 
 		// this is the start of the big tamale!!  here is where all of the action occurs on key presses for letters
 		// start by confirming that it IS a letter and there are still guesses remaining
-		else if (entry.keyCode > 64 && entry.keyCode < 91 && loop1 > 1 && guesses >= 0) {
+		else if (entry.keyCode > 64 && entry.keyCode < 91 && loop1 > 1 && guesses >= 0 && gameOver < 1) {
 			letter = entry.keyCode;
 			console.log("letter code: " + letter);
 			// update the game image
@@ -120,6 +121,10 @@ $(document).ready(function() {
 				if (wordArray.indexOf(letterChar) >= 0) {
 					changeImage(guesses);
 					arrayLength = wordArray.length;
+					// sound effect for correct entry
+					audio2 = new Audio("assets/sounds/Bell-tone.mp3");
+					audio2.play();
+
 					console.log("length: " + arrayLength + " | type: " + typeof(arrayLength));
 					for (var j=0; j < arrayLength; j++) {
 						console.log("letterChar: " + letterChar + " | wordArray[j]: " + wordArray[j]);
@@ -133,6 +138,9 @@ $(document).ready(function() {
 				}
 				// if the letter is not in the word, check for a loss.  If not a loss, remove one guess and update the guess count
 				else {
+					// play a wrong entry sound effect
+					audio3 = new Audio("assets/sounds/Game-show-buzzer-sound.mp3");
+					audio3.play();
 					checkLoss();
 					if (gameOver < 1) {
 						guesses--;
@@ -215,6 +223,10 @@ $(document).ready(function() {
 				$("#text2").html("Sticky has been set free.");
 				//change game image
 				$("#gameImage").attr("src", "assets/images/hangman_backdrop_win.jpg");
+				audio1.pause();
+				audio5 = new Audio("assets/sounds/Game-over-yeah.mp3");
+				audio5.play();	
+				gameOver = 1;
 			}
 			
 			else if (roundsWon < 5) {
@@ -247,6 +259,11 @@ $(document).ready(function() {
 				for (var k=0; k<arrayLength; k++) {
 					document.getElementById(lettersId[k]).innerHTML = "?";
 				}
+
+				// restart the funky game track
+				audio1.pause();
+				audio1 = new Audio("assets/sounds/Funkorama.mp3");
+				audio1.play();	
 			}
 		}
 	}
@@ -259,9 +276,9 @@ $(document).ready(function() {
 			$("#text1").html("<h1>GAME OVER</h1>");
 			$("#text2").html("");
 			// stop game traack and play death audio track from Pac-Man
-			audio.pause();
-			audio = new Audio("assets/sounds/Pacman-death-sound.mp3");
-			audio.play();
+			audio1.pause();
+			audio4 = new Audio("assets/sounds/Pacman-death-sound.mp3");
+			audio4.play();
 			gameOver = 1;
 		}
 	}
